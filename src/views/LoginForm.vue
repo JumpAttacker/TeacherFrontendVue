@@ -1,20 +1,22 @@
 <template>
   <v-container>
     <v-row align="center" justify="center">
-      <v-col class="mt-5" cols="12" md="4" sm="8">
+      <v-col class="mt-5" cols="12" lg="3" md="4" sm="8">
         <span v-if="IsAuth" class="display-1"
-          >Добро пожаловать, {{ GetLogin }}!</span
+        >Добро пожаловать, {{ GetLogin }}!</span
         >
         <v-card elevation="5" v-else>
-          <v-card-title>Авторизация</v-card-title>
+          <v-card-title class="justify-center display-1"
+          >Авторизация
+          </v-card-title>
           <v-card-text>
             <v-form>
               <v-text-field
-                label="Логин"
-                name="login"
-                prepend-icon="mdi-account"
-                type="text"
-                v-model="login"
+                  label="Логин"
+                  name="login"
+                  prepend-icon="mdi-account"
+                  type="text"
+                  v-model="email"
               />
 
               <v-text-field
@@ -25,19 +27,24 @@
                 type="password"
                 v-model="password"
               />
+              <span class="click font-italic font-weight-light">Забыли пароль?</span>
             </v-form>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" v-on:click="routeToRegistration">
-              Регистрация
-            </v-btn>
-            <v-spacer />
-            <v-btn color="primary" v-on:click="tryToAuth">
+            <v-btn block color="primary" v-on:click="tryToAuth">
               Войти
               <v-icon>
                 mdi-login-variant
               </v-icon>
             </v-btn>
+          </v-card-actions>
+          <v-card-actions class="caption">
+            <v-spacer/>
+            <span class="font-italic font-weight-light">Нет аккаунта? </span>
+            <span class="ml-1 click font-italic font-weight-light" v-on:click="routeToRegistration"
+            >Зарегестрироваться</span
+            >
+            <v-spacer/>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -50,8 +57,8 @@ export default {
   name: "LoginForm",
   data: function() {
     return {
-      login: "",
-      password: ""
+        email: "",
+        password: ""
     };
   },
   methods: {
@@ -60,8 +67,8 @@ export default {
     },
     tryToAuth: async function() {
       await this.$store.dispatch("Auth", {
-        login: this.login,
-        password: this.password
+          email: this.email,
+          password: this.password
       });
     }
   },
@@ -84,4 +91,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .click:hover {
+    cursor: pointer;
+  }
+</style>
