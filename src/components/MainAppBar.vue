@@ -11,15 +11,12 @@
         Регистрация
       </router-link>
     </span>
-    <v-spacer></v-spacer>
 
-    <v-btn
-      href="https://github.com/vuetifyjs/vuetify/releases/latest"
-      target="_blank"
-      text
-    >
-      <span class="mr-2">Latest Release</span>
-      <v-icon>mdi-open-in-new</v-icon>
+    <v-spacer />
+
+    <span>{{ GetLogin }}</span>
+    <v-btn icon :disabled="!IsAuth" v-on:click="Logout()">
+      <v-icon>mdi-logout-variant</v-icon>
     </v-btn>
   </v-app-bar>
 </template>
@@ -31,6 +28,20 @@ export default {
     toHome: function() {
       const path = "/";
       if (this.$route.path !== path) this.$router.push(path);
+    },
+    Logout: function () {
+      this.$store.dispatch("Logout");
+    }
+  },
+  computed: {
+    /**
+     * @return {boolean}
+     */
+    IsAuth() {
+      return this.GetLogin !== null;
+    },
+    GetLogin() {
+      return this.$store.getters.GetLogin;
     }
   }
 };

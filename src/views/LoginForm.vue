@@ -1,8 +1,11 @@
 <template>
   <v-container>
     <v-row align="center" justify="center">
-      <v-col align="center" class="mt-5" cols="12" md="4" sm="8">
-        <v-card elevation="5">
+      <v-col class="mt-5" cols="12" md="4" sm="8">
+        <span v-if="IsAuth" class="display-1"
+          >Добро пожаловать, {{ GetLogin }}!</span
+        >
+        <v-card elevation="5" v-else>
           <v-card-title>Авторизация</v-card-title>
           <v-card-text>
             <v-form>
@@ -43,23 +46,6 @@
 </template>
 
 <script>
-function GetUserWelcome(token) {
-  const myHeaders = new Headers();
-    console.log(`token:`,token)
-  myHeaders.append("Authorization", "Bearer " + token);
-
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    redirect: "follow"
-  };
-
-  fetch("https://localhost:5001/api/Login/Post", requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log("error", error));
-}
-
 export default {
   name: "LoginForm",
   data: function() {
@@ -73,24 +59,26 @@ export default {
       this.$router.push("/registration");
     },
     tryToAuth: async function() {
-      const myHeaders = new Headers();
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow"
-      };
-      try {
-        console.log(`trying to to some shit`, this.login, this.password);
-        const response = await fetch(
-          `https://localhost:5001/api/Login?name=${this.login}&password=${this.password}`,
-          requestOptions
-        );
-        const result = await response.json();
-        console.log(result.token);
-        GetUserWelcome(result.token);
-      } catch (e) {
-        console.error(e);
-      }
+      await this.$store.dispatch("Auth", {
+        login: this.login,
+        password: this.password
+      });
+    }
+  },
+  computed: {
+    /**
+     * @return {boolean}
+     */
+    IsAuth() {
+      return this.GetLogin !== null;
+    },
+    GetLogin() {
+      return this.$store.getters.GetLogin;
+    }
+  },
+  mounted() {
+    if (this.IsAuth) {
+      this.$router.push("/");
     }
   }
 };
