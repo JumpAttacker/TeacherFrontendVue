@@ -29,12 +29,14 @@
               <!--                required-->
               <!--              />-->
               <v-text-field
+                  :counter="25"
                   :rules="fioRules"
                   label="Имя"
                   required
                   v-model="firstName"
               />
               <v-text-field
+                  :counter="25"
                   :rules="fioRules"
                   label="Фамилия"
                   required
@@ -69,7 +71,10 @@
               />
             </v-form>
             <v-card-actions>
-              <v-btn :disabled="!valid || !checkbox" block color="primary">Зарегестрироваться</v-btn>
+              <v-btn :disabled="!valid || !checkbox" block color="primary"
+              >Зарегестрироваться
+              </v-btn
+              >
             </v-card-actions>
           </v-card>
         </v-col>
@@ -93,13 +98,16 @@ export default {
       ],
       fioRules: [v => !!v || "Поле обязательное"],
       email: "",
-    emailRules: [
-      v => !!v || "E-mail is required",
-      v => /.+@.+\..+/.test(v) || "E-mail must be valid"
-    ],
-    select: null,
-    items: ["Физика", "Математика", "Информатика"],
-    checkbox: false
+      emailRules: [
+          v => !!v || "E-mail is required",
+          v =>
+              /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/.test(
+                  v
+              ) || "E-mail must be valid"
+      ],
+      select: null,
+      items: ["Физика", "Математика", "Информатика"],
+      checkbox: false
   }),
 
   methods: {
