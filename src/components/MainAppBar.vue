@@ -23,28 +23,28 @@
 
 <script>
 export default {
-  name: "MainAppBar",
+  name: 'MainAppBar',
   methods: {
-    toHome: function() {
-      const path = "/";
-      if (this.$route.path !== path) this.$router.push(path);
+    toHome: function () {
+      const path = '/'
+      if (this.$route.path !== path) this.$router.push(path)
     },
     Logout: function () {
-      this.$store.dispatch("Logout");
+      this.$store.dispatch('Logout')
     }
   },
   computed: {
     /**
      * @return {boolean}
      */
-    IsAuth() {
-      return this.GetLogin !== null;
+    IsAuth () {
+      return this.GetLogin !== null
     },
-    GetLogin() {
-      return this.$store.getters.GetLogin;
+    GetLogin () {
+      return this.$store.getters.GetLogin
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
