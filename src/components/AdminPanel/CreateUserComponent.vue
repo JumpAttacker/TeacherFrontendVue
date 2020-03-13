@@ -64,9 +64,7 @@
      */
     function GetCurrentTime() {
         const today = new Date();
-        const date =
-            today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-        return date;
+        return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
     }
 
     export default {
