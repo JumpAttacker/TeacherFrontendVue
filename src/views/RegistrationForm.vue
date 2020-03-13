@@ -1,5 +1,9 @@
 <template>
   <div>
+    <v-overlay :value="isLoading">
+      <v-progress-circular color="grey lighten-5" indeterminate/>
+    </v-overlay>
+
     <v-container v-if="IsAuth">
       <v-row align="center" justify="center">
         <span class="display-1">
@@ -17,17 +21,18 @@
       <v-row justify="center">
         <v-col class="mt-5" cols="12" lg="3" md="4" sm="8">
           <v-card elevation="5">
+            <v-alert
+                :type="GetAlertType"
+                dismissible
+                transition="scale-transition"
+                v-if="ShowAlertMessage"
+            >
+              {{ GetAlertMessage }}
+            </v-alert>
             <v-card-title class="justify-center display-1">
               Регистрация
             </v-card-title>
             <v-form class="ma-4" lazy-validation ref="form" v-model="valid">
-              <!--              <v-text-field-->
-              <!--                v-model="login"-->
-              <!--                :counter="25"-->
-              <!--                :rules="nameRules"-->
-              <!--                label="Логин"-->
-              <!--                required-->
-              <!--              />-->
               <v-text-field
                   :counter="25"
                   :rules="fioRules"
@@ -48,8 +53,21 @@
                   required
                   v-model="email"
               />
+              <v-text-field
+                  :type="'password'"
+                  label="Пароль"
+                  required
+                  v-model="password"
+              />
+              <v-text-field
+                  :rules="[v => password === v || 'Пароли должны совпадать']"
+                  :type="'password'"
+                  label="Подтвердить пароль"
+                  required
+                  v-model="password2"
+              />
               <v-select
-                  :items="items"
+                  :items="$store.getters.GetList"
                   :rules="[v => v.length > 0 || 'Необходимо выбрать предметы']"
                   label="Предметы"
                   multiple
@@ -61,7 +79,7 @@
                   :rules="[v => !!v || 'Необходимо выбрать класс']"
                   label="Класс"
                   required
-                  v-model="select"
+                  v-model="classNumber"
               />
               <v-checkbox
                   :rules="[v => !!v || 'You must agree to continue!']"
@@ -71,10 +89,14 @@
               />
             </v-form>
             <v-card-actions>
-              <v-btn :disabled="!valid || !checkbox" block color="primary"
-              >Зарегестрироваться
-              </v-btn
+              <v-btn
+                  :disabled="!valid || !checkbox || !IsNotEmpty"
+                  block
+                  color="primary"
+                  v-on:click="Registration"
               >
+                Зарегестрироваться
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -84,11 +106,16 @@
 </template>
 
 <script>
+    function isBigEnough(element) {
+        return element.length >= 0;
+    }
 export default {
   name: "RegistrationForm",
   data: () => ({
       valid: false,
       login: "",
+      password: "",
+      password2: "",
       firstName: "",
       secondName: "",
       selectedItems: [],
@@ -105,38 +132,103 @@ export default {
                   v
               ) || "E-mail must be valid"
       ],
-      select: null,
+      classNumber: null,
       items: ["Физика", "Математика", "Информатика"],
-      checkbox: false
+      checkbox: false,
+      isLoading: false
   }),
 
   methods: {
-    validate() {
-      const validate = this.$refs.form.validate();
-      console.log(validate);
-    },
-    reset() {
-      this.$refs.form.reset();
-    },
-    resetValidation() {
-      this.$refs.form.resetValidation();
-    },
-    Logout: function() {
-      this.$store.dispatch("Logout");
-    }
+      validate() {
+          const validate = this.$refs.form.validate();
+          console.log(validate);
+      },
+      reset() {
+          this.$refs.form.reset();
+      },
+      resetValidation() {
+          this.$refs.form.resetValidation();
+      },
+      /**
+       * @return {boolean}
+       */
+      IsStrNotEmpty(arrayOfStr) {
+          return arrayOfStr.every(isBigEnough);
+      },
+      Logout: function () {
+          this.$store.dispatch("Logout");
+      },
+      async Registration() {
+          let registrationData = {
+              email: this.email,
+              firstName: this.firstName,
+              secondName: this.secondName,
+              password: this.password,
+              classNumber: this.classNumber,
+              wantToLearn: this.selectedItems
+          };
+          this.$store.commit("SetRegStatus", {});
+          this.isLoading = true;
+          await this.$store.dispatch("Registration", registrationData);
+          this.isLoading = false;
+          if (this.$store.getters.GetRegStatus.ErrorMessage) {
+          } else {
+              // await this.$router.push("/");
+          }
+      }
   },
-  components: {},
-  computed: {
-    /**
-     * @return {boolean}
-     */
-    IsAuth() {
-      return this.GetLogin !== null;
+    mounted() {
+        this.$store.dispatch("LoadSubjects");
+        this.$store.commit("SetRegStatus", {});
     },
-    GetLogin() {
-      return this.$store.getters.GetLogin;
+    components: {},
+    computed: {
+        /**
+         * @return {boolean}
+         */
+        IsAuth() {
+            return this.GetLogin !== null;
+        },
+        /**
+         * @return {string}
+         */
+        GetLogin() {
+            return this.$store.getters.GetLogin;
+        },
+
+        /**
+         * @return {boolean}
+         */
+        IsNotEmpty() {
+            return (
+                this.IsStrNotEmpty([
+                    this.email,
+                    this.firstName,
+                    this.secondName,
+                    this.password,
+                    this.password
+                ]) && this.classNumber
+            );
+        },
+        /**
+         * @return {boolean}
+         */
+        ShowAlertMessage() {
+            return this.$store.getters.GetStatus.Message;
+        },
+        /**
+         * @return {string}
+         */
+        GetAlertMessage() {
+            return this.$store.getters.GetStatus.Message;
+        },
+        /**
+         * @return {string}
+         */
+        GetAlertType() {
+            return this.$store.getters.GetStatus.IsError ? "error" : "success";
+        }
     }
-  }
 };
 </script>
 

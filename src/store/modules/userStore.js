@@ -4,13 +4,16 @@ export default {
   state: {
     Login: localStorage.Login || null,
     Token: localStorage.Token || null,
-    Status: null
+    Status: {
+      IsError: false,
+      Message: ""
+    }
   },
   getters: {
     GetLogin: state => state.Login,
     GetToken: state => state.Token,
     IsAuthenticated: state => !!state.Token,
-    GetAuthStatus: state => state.Status
+    GetStatus: state => state.Status
   },
   mutations: {
     SetLogin: (state, newLogin) => {
@@ -18,6 +21,9 @@ export default {
     },
     SetToken: (state, newToken) => {
       state.Token = newToken;
+    },
+    SetStatus: (state, newStatus) => {
+      state.Status = newStatus;
     }
   },
   actions: {
@@ -30,7 +36,7 @@ export default {
         );
         const {login, token, error} = response.data;
         if (error) {
-          alert(error);
+          commit("SetStatus", {Message: error, IsError: true});
           return;
         }
         console.log(response);
@@ -40,7 +46,34 @@ export default {
         localStorage.Token = token;
         axios.defaults.headers.common.Authorization = "Bearer " + token;
       } catch (e) {
-        alert("Ошибка при выполнение запроса");
+        commit("SetStatus", {Message: 'Ошибка при выполнение запроса', IsError: true});
+        console.log("error -> ", e);
+      }
+    },
+    async Registration({commit}, registrationModel) {
+      try {
+        const response = await axios.post(
+            `https://localhost:5001/api/Registration`,
+            registrationModel,
+            {
+              headers: {
+                "content-type": "application/json"
+              }
+            }
+        );
+        const {message, error} = response.data;
+        if (error) {
+          // alert(error);
+          commit("SetStatus", {Message: error, IsError: true});
+          return;
+        }
+        commit("SetStatus", {Message: message, IsError: false});
+        console.log(response);
+      } catch (e) {
+        commit("SetStatus", {
+          Message: "Ошибка при выполнение запроса",
+          IsError: true
+        });
         console.log("error -> ", e);
       }
     },

@@ -37,7 +37,7 @@
             const dat = this;
             axios.interceptors.response.use(undefined, function (err) {
                 return new Promise(function (resolve, reject) {
-                    dat.$store.dispatch("Logout");
+                    //dat.$store.dispatch("Logout");
                     if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
                         // if you ever get an unauthorized, logout the user
                         this.$store.dispatch("Logout");
