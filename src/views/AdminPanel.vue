@@ -13,6 +13,9 @@
           >
             <UserItemComponent :item="item"/>
           </v-col>
+          <v-col cols="3">
+            <CreateUserComponent/>
+          </v-col>
         </v-row>
       </v-container>
     </v-tab-item>
@@ -25,6 +28,7 @@
 <script>
     import axios from "axios";
     import UserItemComponent from "../components/AdminPanel/UserItemComponent";
+    import CreateUserComponent from "../components/AdminPanel/CreateUserComponent";
 
     export default {
         name: "AdminPanel",
@@ -50,10 +54,11 @@
             );
             console.log(response.data.list);
             this.users = response.data.list;
-            this.$store.dispatch("LoadSubjects");
+            await this.$store.dispatch("LoadSubjects");
         },
         components: {
-            UserItemComponent
+            UserItemComponent,
+            CreateUserComponent
         }
     };
 </script>
